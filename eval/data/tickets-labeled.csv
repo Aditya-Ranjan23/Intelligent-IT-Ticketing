@@ -1,0 +1,16 @@
+text,expected_label
+"My VPN keeps disconnecting every few minutes",NET_VPN_DISCONNECT
+"vpn tunnel drops when on wifi",NET_VPN_DISCONNECT
+"Outlook is not syncing my mailbox since yesterday",MAIL_OUTLOOK_SYNC
+"exchange calendar not updating in outlook",MAIL_OUTLOOK_SYNC
+"I forgot my password and cannot sign in",ACC_PASSWORD_RESET
+"account locked after failed login attempts",ACC_PASSWORD_RESET
+"printer stuck in queue and spooler errors",HW_PRINT_SPOOLER
+"cannot print to network printer",HW_PRINT_SPOOLER
+"Microsoft Teams crashes on launch",APP_TEAMS_CRASH
+"teams freeze during video call",APP_TEAMS_CRASH
+"asdf qwer zxcv nothing matches",UNKNOWN_ESCALATION
+"the thing is broken please help",UNKNOWN_ESCALATION
+"VPN + Outlook both broken after update",NET_VPN_DISCONNECT
+"screenshot attached showing error",UNKNOWN_ESCALATION
+"Print spooler service fails to start",HW_PRINT_SPOOLER

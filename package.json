@@ -1,0 +1,27 @@
+{
+  "name": "it-ticket-auto-resolution",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "demo": "tsx scripts/demo.ts",
+    "eval": "tsx scripts/eval.ts"
+  },
+  "dependencies": {
+    "@cursor/sdk": "1.0.12",
+    "@hono/node-server": "^1.13.1",
+    "hono": "^4.6.12",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
