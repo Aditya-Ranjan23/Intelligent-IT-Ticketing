@@ -1,6 +1,6 @@
 {
   "name": "it-ticket-auto-resolution",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "private": true,
   "description": "ML in Python (ml/ + api/). Legacy Node/Cursor SDK optional under src/.",
   "scripts": {
