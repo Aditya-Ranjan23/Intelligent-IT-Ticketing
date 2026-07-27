@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IT Ticket ML — Demo</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+    .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .sub a { color: var(--accent); }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.35rem; }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 0.75rem;
+      border: 1px solid #2d3a4f;
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+      font: inherit;
+      resize: vertical;
+    }
+    button {
+      margin-top: 0.75rem;
+      padding: 0.6rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: wait; }
+    .samples { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .samples button {
+      margin: 0;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid #2d3a4f;
+      font-size: 0.8rem;
+    }
+    #out {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid #2d3a4f;
+      display: none;
+    }
+    #out.visible { display: block; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .badge.cache { background: #14532d; color: #86efac; }
+    .badge.ml { background: #1e3a5f; color: #93c5fd; }
+    .badge.deep { background: #713f12; color: #fcd34d; }
+    ol { margin: 0.75rem 0 0; padding-left: 1.25rem; }
+    .meta { font-size: 0.85rem; color: var(--muted); margin-top: 0.75rem; }
+    .err { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>IT Ticket Auto-Resolution (ML)</h1>
+    <p class="sub">
+      Python API demo — classify tickets and suggest fixes.
+      <a href="/docs" target="_blank">API docs</a> ·
+      <a href="/ml/stats" target="_blank">memory stats</a>
+    </p>
+
+    <label for="text">Ticket description</label>
+    <textarea id="text" placeholder="e.g. My VPN keeps disconnecting when on Wi-Fi…"></textarea>
+
+    <div class="samples">
+      <button type="button" data-sample="My VPN disconnects constantly when using AnyConnect.">VPN</button>
+      <button type="button" data-sample="Outlook is not syncing my mailbox since yesterday.">Outlook</button>
+      <button type="button" data-sample="the thing is broken please help">Noisy / unknown</button>
+    </div>
+
+    <button type="button" id="go">Resolve ticket</button>
+
+    <div id="out"></div>
+  </div>
+
+  <script>
+    const textEl = document.getElementById("text");
+    const outEl = document.getElementById("out");
+    const goBtn = document.getElementById("go");
+
+    document.querySelectorAll("[data-sample]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        textEl.value = btn.dataset.sample;
+      });
+    });
+
+    goBtn.addEventListener("click", async () => {
+      const text = textEl.value.trim();
+      if (!text) {
+        outEl.className = "visible";
+        outEl.innerHTML = '<p class="err">Enter a ticket description.</p>';
+        return;
+      }
+      goBtn.disabled = true;
+      outEl.className = "visible";
+      outEl.innerHTML = "<p>Resolving…</p>";
+
+      try {
+        const res = await fetch("/tickets/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tenant_id: "demo", text }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || res.statusText);
+
+        const mode = data.resolution_mode || "unknown";
+        const badgeClass =
+          mode === "cache_hit" ? "cache" : mode === "ml_needs_deep" ? "deep" : "ml";
+        const steps = (data.suggested_steps || [])
+          .map((s) => `<li>${escapeHtml(s)}</li>`)
+          .join("");
+
+        let cacheLine = "";
+        if (data.cache) {
+          cacheLine = `<p class="meta">Cache hit · similarity ${(data.cache.similarity * 100).toFixed(0)}% · tokens saved</p>`;
+        }
+
+        outEl.innerHTML = `
+          <span class="badge ${badgeClass}">${escapeHtml(mode)}</span>
+          <strong>${escapeHtml(data.classification)}</strong>
+          <span class="meta">confidence ${(data.confidence * 100).toFixed(0)}% · ${data.latency_ms} ms</span>
+          ${cacheLine}
+          <ol>${steps}</ol>
+          ${data.deep_resolution ? `<p class="meta">${escapeHtml(data.deep_resolution.note || "")}</p>` : ""}
+        `;
+      } catch (e) {
+        outEl.innerHTML = `<p class="err">${escapeHtml(String(e.message || e))}</p>`;
+      } finally {
+        goBtn.disabled = false;
+      }
+    });
+
+    function escapeHtml(s) {
+      return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>

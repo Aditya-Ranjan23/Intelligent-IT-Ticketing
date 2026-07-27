@@ -1,0 +1,77 @@
+"""
+Offline evaluation script for v0.2.0 Python classifier pipeline against eval/data/tickets-labeled.csv.
+Measures top-1 accuracy, reports mismatches, and outputs actual performance metrics.
+"""
+import csv
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from app.core.database import SessionLocal, init_db
+from app.services.classifier_service import classify_ticket
+from scripts.seed_db import seed
+
+CSV_PATH = ROOT / "eval" / "data" / "tickets-labeled.csv"
+
+
+def evaluate():
+    print("Ensuring database is seeded...")
+    seed()
+
+    db = SessionLocal()
+    try:
+        rows: list[tuple[str, str]] = []
+        with CSV_PATH.open(encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append((row["text"], row["expected_label"]))
+
+        top1 = 0
+        mismatches: list[str] = []
+        category_counts: dict[str, dict[str, int]] = {}
+
+        print(f"\nRunning evaluation on {len(rows)} labeled ticket samples...")
+        for text, expected in rows:
+            res = classify_ticket(db=db, text=text)
+            got = res.classification
+
+            if expected not in category_counts:
+                category_counts[expected] = {"correct": 0, "total": 0}
+            category_counts[expected]["total"] += 1
+
+            if got == expected:
+                top1 += 1
+                category_counts[expected]["correct"] += 1
+            else:
+                mismatches.append(f"Expected: {expected:<20} | Got: {got:<20} | Conf: {res.confidence:.2f} | Text: {text[:60]}")
+
+        acc = (top1 / len(rows)) * 100.0 if rows else 0.0
+
+        print("\n" + "=" * 60)
+        print(f"OFFLINE EVALUATION RESULT (v0.2.0 Python Classifier):")
+        print(f"Top-1 Accuracy: {top1}/{len(rows)} ({acc:.1f}%)")
+        print("=" * 60)
+
+        print("\nCategory Breakdown:")
+        for cat, stats in sorted(category_counts.items()):
+            cat_acc = (stats["correct"] / stats["total"]) * 100.0 if stats["total"] else 0.0
+            print(f"  - {cat:<22}: {stats['correct']}/{stats['total']} ({cat_acc:.1f}%)")
+
+        if mismatches:
+            print("\nMismatches:")
+            for m in mismatches:
+                print("  -", m)
+
+        return acc, top1, len(rows)
+
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    acc, top1, total = evaluate()
+    if acc < 80.0:
+        print(f"\nWarning: Accuracy {acc:.1f}% is below 80.0% target threshold.", file=sys.stderr)
+        sys.exit(2)

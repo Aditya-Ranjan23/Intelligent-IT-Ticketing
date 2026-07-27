@@ -1,16 +1,16 @@
 {
   "name": "it-ticket-auto-resolution",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "ML in Python (ml/ + api/). Legacy Node/Cursor SDK optional under src/.",
+  "description": "Intelligent IT Ticket Auto-Resolution System v0.2.0 (Python FastAPI + pgvector + Redis)",
   "scripts": {
-    "ml:install": "pip install -r requirements.txt",
-    "ml:serve": "python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload",
-    "ml:eval": "python scripts/eval_ml.py",
-    "ml:seed": "python scripts/seed_memory.py",
-    "ml:demo": "python scripts/demo_api.py",
-    "build": "echo \"Use Python ML: npm run ml:serve\"",
-    "start": "npm run ml:serve"
+    "install:deps": "pip install -r requirements.txt",
+    "seed": "python scripts/seed_db.py",
+    "serve": "python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "eval": "python scripts/eval.py",
+    "demo": "python scripts/demo.py",
+    "docker:up": "docker-compose up -d --build",
+    "start": "npm run serve"
   },
   "dependencies": {},
   "devDependencies": {},

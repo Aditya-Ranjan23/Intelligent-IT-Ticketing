@@ -5,15 +5,27 @@ All notable changes to the Intelligent IT Ticket Auto-Resolution System will be 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-27
+
+### Added
+- **Full Stack Python Rewrite**: Replaced legacy TypeScript/Hono implementation with a modular Python FastAPI architecture (`app/`).
+- **PostgreSQL + pgvector**: Vector database support with 384-dimensional `sentence-transformers` embeddings (`all-MiniLM-L6-v2`) for semantic issue cluster search and Q&A memory.
+- **Hybrid Classifier**: Primary vector embedding similarity search with scikit-learn (TF-IDF + LogisticRegression) fallback classifier (`app/services/classifier_service.py`).
+- **Real OCR Integration**: Real image text extraction from screenshot bytes using `pytesseract` and `Pillow` (`app/services/ocr_service.py`).
+- **Google Gemini RAG Deep Resolution**: Replaced Cursor Agent SDK with direct Google Gemini API (`gemini-2.5-flash`) RAG deep resolution with structured mock fallback (`app/services/llm_service.py`).
+- **Redis Cache Layer**: Caches ticket resolution responses keyed by SHA-256 hash of normalized text (`app/services/cache_service.py`).
+- **Docker Compose Environment**: Local orchestration via `docker-compose.yml` (FastAPI + PostgreSQL pg16 + Redis 7).
+- **Expanded Seed Dataset**: Expanded `eval/data/tickets-labeled.csv` to 63 labeled ticket examples across 5 IT categories and unknown escalation.
+- **Python Evaluation & Demo Scripts**: Added `scripts/eval.py`, `scripts/seed_db.py`, and `scripts/demo.py`.
+
+### Changed
+- **Legacy Code Preservation**: Moved legacy TypeScript files to `legacy/src/` and `legacy/scripts/`.
+- **Status Polling**: Fully implemented active polling endpoint `GET /tickets/{ticket_id}/status`.
+
+---
+
 ## [0.1.0] - 2026-07-27
 
 ### Added
-- **Python FastAPI ML Service**: Core HTTP server (`api/main.py`) exposing ticket resolution (`POST /tickets/resolve`), memory persistence (`POST /memory/store`, `POST /memory/resolve-and-store`), health monitoring (`GET /health`), and memory statistics (`GET /ml/stats`).
-- **Keyword Classifier & Playbook Engine**: Rule-based ticket classifier (`ml/classifier.py`) supporting 5 baseline IT categories (`NET_VPN_DISCONNECT`, `MAIL_OUTLOOK_SYNC`, `ACC_PASSWORD_RESET`, `HW_PRINT_SPOOLER`, `APP_TEAMS_CRASH`) plus `UNKNOWN_ESCALATION` fallback (`ml/playbooks.py`).
-- **Q&A Memory Cache**: JSON-backed resolution memory store (`ml/memory/qa_store.py`) with character-set Jaccard/overlap string similarity matching (`ml/memory/similarity.py`) to reuse previously resolved tickets.
-- **Offline ML Evaluation**: Python evaluation script (`scripts/eval_ml.py`) testing classifier accuracy against a 15-row labeled CSV benchmark (`eval/data/tickets-labeled.csv`).
-- **TypeScript / Cursor SDK Deep Resolution Worker**: Asynchronous deep resolution agent (`src/agents/resolveTicket.ts`) using `@cursor/sdk` for low-confidence tickets, backed by an in-memory `Map` ticket store (`src/store.ts`).
-- **Documentation Baseline**: Technical documentation suite including PRD (`docs/PRD.md`), Architecture (`docs/ARCHITECTURE.md`), and Known Limitations (`docs/KNOWN_LIMITATIONS.md`).
-
-### Deprecated
-- **TypeScript Entrypoints**: `src/index.ts` and `src/fastPath.ts` deprecated in favor of the Python ML FastAPI service.
+- Initial baseline documentation suite (`README.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, `docs/KNOWN_LIMITATIONS.md`).
+- Versioning baseline `v0.1.0`.

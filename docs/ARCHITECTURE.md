@@ -1,8 +1,8 @@
-# System Architecture — Intelligent IT Ticket Auto-Resolution System
+# System Architecture — Intelligent IT Ticket Auto-Resolution System (`v0.2.0`)
 
 ## 1. System Overview
 
-The Intelligent IT Ticket Auto-Resolution System operates via a dual-path architecture designed to provide rapid triage for common IT issues while offering deep AI agent resolution for low-confidence or complex tickets.
+In `v0.2.0`, the system was fully rewritten from TypeScript/Hono to a **Python FastAPI** service supported by **PostgreSQL + `pgvector`**, **Redis caching**, **Real pytesseract OCR**, **Hybrid Classifier** (`sentence-transformers` + `scikit-learn`), and **Google Gemini RAG Deep Resolution**.
 
 ```
                                 +-----------------------------------+
@@ -12,106 +12,110 @@ The Intelligent IT Ticket Auto-Resolution System operates via a dual-path archit
                                                   |
                                                   v
                                 +-----------------------------------+
-                                |      FastAPI (`api/main.py`)      |
+                                |     FastAPI (`app/main.py`)       |
                                 +-----------------------------------+
                                                   |
                                                   v
                                 +-----------------------------------+
-                                |    Resolver (`ml/resolver.py`)    |
+                                |  OCR (`app/services/ocr_service`) |
+                                |  Extracts text via pytesseract    |
+                                +-----------------------------------+
+                                                  |
+                                                  v
+                                +-----------------------------------+
+                                | Redis Cache (`cache_service.py`)  |
+                                | Normalized hash key lookup        |
                                 +-----------------------------------+
                                                   |
                          +------------------------+------------------------+
-                         |                                                 |
+                         | (Cache Miss)                                    | (Cache Hit)
                          v                                                 v
         +----------------------------------+             +----------------------------------+
-        |   Q&A Cache Store Lookup         |             |   ML Feature Preprocessing       |
-        |   (`ml/memory/qa_store.py`)      |             |   (`ml/preprocess.py`)           |
+        |   Q&A Memory Store Lookup        |             |   Return Instant Cache Hit       |
+        |   pgvector similarity search     |             |   Tokens saved, latency < 50ms   |
         +----------------------------------+             +----------------------------------+
-                         |                                                 |
-                         | (Match >= Threshold 0.82)                       v
-                         |                               +----------------------------------+
-                         |                               |   Keyword Classifier             |
-                         |                               |   (`ml/classifier.py`)           |
-                         |                               +----------------------------------+
-                         |                                                 |
+                         |
+                         v
+        +----------------------------------+
+        |   Hybrid Ticket Classifier       |
+        |   Sentence-Transformers (384d)   |
+        |   + Scikit-Learn Fallback        |
+        +----------------------------------+
+                         |
+                         +------------------------+------------------------+
+                         | (Conf >= 0.72)                                  | (Conf < 0.72 / UNKNOWN)
                          v                                                 v
-         [ Mode: `cache_hit` ]                           [ Mode: `ml_complete` / `ml_needs_deep` ]
-        Instant Response &                                 Evaluated against confidence threshold
-        Token Savings                                      (Default `CONFIDENCE_THRESHOLD = 0.72`)
+        [ Mode: `ml_complete` ]                          [ Mode: `ml_needs_deep` ]
+        Instant Playbook Response                        Async RAG Deep Resolution via
+                                                         Google Gemini API (`gemini-2.5-flash`)
 ```
 
 ---
 
-## 2. Sequence Diagram (Ticket Resolution Flow)
+## 2. Sequence Diagram (v0.2.0 Flow)
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as Client / User
-    participant API as FastAPI (api/main.py)
-    participant Resolver as Resolver (ml/resolver.py)
-    participant Cache as Q&A Store (ml/memory/qa_store.py)
-    participant Pipeline as ML Pipeline (ml/pipeline.py)
-    participant Classifier as Classifier (ml/classifier.py)
-    participant SDK as Cursor SDK Worker (src/agents/resolveTicket.ts)
+    participant API as FastAPI (app/main.py)
+    participant OCR as OCR Service (ocr_service.py)
+    participant Cache as Redis Cache (cache_service.py)
+    participant Classifier as Hybrid Classifier (classifier_service.py)
+    participant PG as PostgreSQL + pgvector
+    participant LLM as Gemini RAG Service (llm_service.py)
 
     User->>API: POST /tickets/resolve { text, imageBase64, logSnippet }
-    API->>Resolver: resolve_ticket(text, imageBase64, logSnippet)
-    Resolver->>Pipeline: run_ml_pipeline(...)
-    Pipeline->>Classifier: classify_ticket(combined_text)
-    Classifier-->>Pipeline: MlResult (classification, confidence, steps)
-    Pipeline-->>Resolver: MlResult
+    API->>OCR: extract_text_from_base64(imageBase64)
+    OCR-->>API: (ocr_text, has_screenshot)
+    API->>Cache: get_cached_resolution(text_hash)
+    alt Redis Cache Hit
+        Cache-->>API: cached_data
+        API-->>User: HTTP 200 { resolution_mode: "cache_hit", suggested_steps }
+    else Redis Cache Miss
+        API->>Classifier: classify_ticket(db, text, ocr_text, log_snippet)
+        Classifier->>PG: Cosine Distance Search on IssueCluster (vector(384))
+        PG-->>Classifier: Best Vector Cluster & Similarity Score
+        alt Vector Similarity >= 0.65
+            Classifier-->>API: ClassificationResult (confidence, steps)
+        else Vector Similarity < 0.65
+            Classifier->>Classifier: Scikit-learn TF-IDF + LogisticRegression Fallback
+            Classifier-->>API: Fallback ClassificationResult
+        end
 
-    Resolver->>Cache: find_similar_question(normalized_text)
-    alt Cache Hit (Similarity >= CACHE_SIMILARITY_THRESHOLD [default 0.82])
-        Cache-->>Resolver: SimilarHit (entry, similarity)
-        Resolver-->>API: CacheHitOutcome (mode: "cache_hit")
-        API-->>User: HTTP 200 { resolution_mode: "cache_hit", suggested_steps, cache }
-    else Cache Miss
-        Cache-->>Resolver: None
-        alt Confidence >= CONFIDENCE_THRESHOLD (default 0.72) AND classification != UNKNOWN_ESCALATION
-            Resolver-->>API: MlCompleteOutcome (mode: "ml_complete")
-            API-->>User: HTTP 200 { resolution_mode: "ml_complete", classification, confidence, suggested_steps }
+        API->>PG: Search QAMemory (vector(384))
+        alt QAMemory Hit (Similarity >= 0.82)
+            PG-->>API: QAMemory Record
+            API-->>User: HTTP 200 { resolution_mode: "cache_hit", suggested_steps }
+        else Confidence >= 0.72 AND Category != UNKNOWN_ESCALATION
+            API-->>User: HTTP 200 { resolution_mode: "ml_complete", classification, confidence }
         else Low Confidence / UNKNOWN_ESCALATION
-            Resolver-->>API: MlNeedsDeepOutcome (mode: "ml_needs_deep")
-            API-->>User: HTTP 200 { resolution_mode: "ml_needs_deep", ticket_id, deep_resolution }
-            opt Async Deep Resolution Escalation (Node/TS Layer)
-                User->>SDK: startDeepResolutionJob({ ticketId, tenantId, text })
-                SDK->>SDK: Cursor Agent SDK query (Agent.create / agent.send)
-                SDK->>SDK: Update in-memory ticket record (src/store.ts)
-            end
+            API->>PG: Create Ticket Record (status: "deep_resolution_running")
+            API-->>User: HTTP 200 { resolution_mode: "ml_needs_deep", ticket_id, poll_path }
+            API->>LLM: Async Task: generate_deep_resolution(...)
+            LLM->>PG: Retrieve RAG Vector Context from QAMemory / IssueCluster
+            LLM->>LLM: Call Google Gemini API (gemini-2.5-flash) with RAG Prompt
+            LLM->>PG: Update Ticket Record (status: "deep_resolution_finished", deep_result_text)
         end
     end
 ```
 
 ---
 
-## 3. Core Components
+## 3. Core Components (v0.2.0)
 
-### 3.1 Python FastAPI & ML Service (`api/` + `ml/`)
-- **FastAPI HTTP Service (`api/main.py`)**: Exposes RESTful endpoints for ticket resolution, Q&A memory store management, and service health checking.
-- **Preprocessing Pipeline (`ml/preprocess.py` + `ml/pipeline.py`)**: Normalizes whitespace, strips noise characters, truncates text to 8,000 characters, appends log snippets, and formats screenshot hints.
-- **Keyword Classifier (`ml/classifier.py` + `ml/playbooks.py`)**: Matches normalized ticket text against 5 hardcoded keyword sets (`NET_VPN_DISCONNECT`, `MAIL_OUTLOOK_SYNC`, `ACC_PASSWORD_RESET`, `HW_PRINT_SPOOLER`, `APP_TEAMS_CRASH`). Computes confidence between 0.20 and 0.97 adjusted by a deterministic hash-based noise penalty heuristic (`noise_penalty`).
-- **Q&A Memory Store (`ml/memory/qa_store.py` + `ml/memory/similarity.py`)**: Persists resolved Q&A entries to `data/qa-memory.json`. Evaluates candidate similarity using a character-set Jaccard/overlap calculation (`text_similarity`).
+### 3.1 Python FastAPI Application (`app/`)
+- **`app/main.py`**: FastAPI entrypoint with lifecycle hooks, CORS middleware, and API router.
+- **`app/api/endpoints.py`**: Implements `POST /tickets/resolve`, `GET /tickets/{id}/status`, `POST /memory/store`, `GET /health`, `GET /ml/stats`.
 
-### 3.2 TypeScript / Cursor SDK Deep Resolution Worker (`src/`)
-- **Agent Job Runner (`src/agents/resolveTicket.ts`)**: Invokes `@cursor/sdk` (`Agent.create` / `agent.send` or `Agent.prompt`) with model ID `composer-2` when `CURSOR_API_KEY` is present. Runs asynchronously in background jobs or one-shot mode.
-- **In-Memory Ticket Store (`src/store.ts`)**: Maintains an in-memory TypeScript `Map<string, AsyncTicketRecord>` tracking status transitions (`pending` -> `deep_resolution_running` -> `deep_resolution_finished` | `deep_resolution_error`).
-- **Zod Schemas (`src/schemas.ts`)**: Validates `resolveTicketBodySchema` and `ticketStatusSchema`.
+### 3.2 Machine Learning & Hybrid Classifier (`app/services/classifier_service.py`)
+- **Primary Vector Classifier**: Encodes ticket text into 384-dimensional dense embeddings using `sentence-transformers` (`all-MiniLM-L6-v2`) and executes cosine similarity search against `pgvector` stored issue clusters.
+- **Fallback Classifier**: Scikit-Learn `TfidfVectorizer` + `LogisticRegression` model trained on seed dataset, activated when vector cluster similarity is below 0.65.
 
----
+### 3.3 Storage & Caching Layer (`app/core/` + `app/models/`)
+- **PostgreSQL + `pgvector`**: Relational tables (`tickets`, `issue_clusters`, `qa_memory`) supporting native vector indexing (`vector(384)`).
+- **Redis Cache**: Caches classification responses keyed by SHA-256 hash of normalized text.
 
-## 4. Stubbed & Placeholder Components
-
-The following architectural components are currently stubs or placeholders in the `v0.1.0` codebase:
-
-1. **OCR Preprocessing Stub (`ml/preprocess.py`)**:
-   - `screenshot_ocr_hint()` returns a hardcoded string (`"[Screenshot attached — OCR pending; using subject/body cues only for this demo.]"`) when `imageBase64` is provided. No actual image decoding or optical character recognition is performed.
-2. **In-Memory TypeScript Ticket Store (`src/store.ts`)**:
-   - Uses an in-memory `Map`. All async ticket state is lost when the Node process terminates.
-3. **Single-File JSON Q&A Store (`ml/memory/qa_store.py`)**:
-   - Reads and writes `data/qa-memory.json` entirely in memory during operations. Not backed by a database index or vector search engine.
-4. **Python Status Polling Endpoint (`api/main.py`)**:
-   - `GET /tickets/{ticket_id}/status` raises HTTP 501 (`"Deep-resolution polling not implemented in Python API yet."`).
-5. **Deprecated TypeScript Fast-Path (`src/fastPath.ts`)**:
-   - `src/fastPath.ts` is an empty export stub (`export {}`).
+### 3.4 OCR & Deep RAG Resolution (`app/services/`)
+- **OCR Engine (`ocr_service.py`)**: Uses `pytesseract` and `Pillow` to extract raw text from base64 image bytes.
+- **Deep Resolution Service (`llm_service.py`)**: RAG Deep Resolution calling Google Gemini API (`gemini-2.5-flash`) with retrieved vector matches, including a structured mock response fallback when `GEMINI_API_KEY` is not provided.

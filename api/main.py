@@ -2,8 +2,11 @@ import os
 import time
 import uuid
 
+from pathlib import Path
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 
 from api.schemas import ResolveTicketRequest, StoreAnswerRequest
 from ml.memory.qa_store import memory_stats, upsert_answer
@@ -15,6 +18,14 @@ app = FastAPI(
     title="IT Ticket Auto-Resolution (ML)",
     description="Classify tickets, suggest fixes, reuse cached Q&A for token savings.",
 )
+
+_STATIC = Path(__file__).parent / "static"
+
+
+@app.get("/", response_class=HTMLResponse)
+def home():
+    """Browser UI — open http://127.0.0.1:8000/ while the server is running."""
+    return (_STATIC / "index.html").read_text(encoding="utf-8")
 
 
 @app.get("/health")
