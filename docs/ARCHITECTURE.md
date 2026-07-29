@@ -1,4 +1,4 @@
-# System Architecture — Intelligent IT Ticket Auto-Resolution System (`v0.2.0` / Phase 2.5)
+# System Architecture — Intelligent IT Ticket Auto-Resolution System (`v0.3.0`)
 
 ## 1. System Overview
 
@@ -52,12 +52,12 @@ The system provides a **Python FastAPI** application supported by **PostgreSQL +
 
 ---
 
-## 2. Held-Out Evaluation Methodology (Phase 2.5 Verification)
+## 2. Held-Out Evaluation Methodology (`v0.3.0`)
 
-To avoid data leakage, dataset evaluation is strictly partitioned:
-- **`eval/data/seed.csv` (51 rows)**: Used exclusively to seed the vector store (`IssueCluster`) and train the scikit-learn fallback model.
-- **`eval/data/holdout.csv` (12 rows)**: Held-out uncompromised test dataset used exclusively to evaluate classification accuracy.
-- **Verified Held-Out Accuracy**: **66.7% (8/12)** top-1 accuracy on unseen ticket data.
+To eliminate data leakage, dataset evaluation is strictly partitioned:
+- **`eval/data/seed.csv` (84 rows)**: Used exclusively to seed vector embeddings (`IssueCluster`) and train the scikit-learn fallback model.
+- **`eval/data/holdout.csv` (24 rows)**: Held-out test dataset (~20% stratified, 4 samples per category across all 6 categories).
+- **Verified Held-Out Accuracy (`v0.3.0`)**: **62.5% (15/24)** top-1 accuracy on uncompromised held-out ticket data.
 
 ---
 

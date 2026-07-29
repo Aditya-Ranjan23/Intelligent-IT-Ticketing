@@ -1,13 +1,25 @@
 text,expected_label
+SSO authentication error invalid credentials try again,ACC_PASSWORD_RESET
+MFA prompt failing during active directory password reset,ACC_PASSWORD_RESET
 I forgot my password and cannot sign in,ACC_PASSWORD_RESET
-account locked after failed login attempts,ACC_PASSWORD_RESET
+Password expired and self service reset portal throws error,ACC_PASSWORD_RESET
+Teams screen sharing causes app to freeze and close,APP_TEAMS_CRASH
+ms teams crashed while switching between tenant accounts,APP_TEAMS_CRASH
 Teams meeting drops out with unexpected app error code 0x8004,APP_TEAMS_CRASH
-High CPU usage causes Microsoft Teams to crash during screen share,APP_TEAMS_CRASH
+teams overlay in game/presentation causes fatal crash,APP_TEAMS_CRASH
+printer printing random gibberish symbols on 50 pages,HW_PRINT_SPOOLER
+print spooler service stopped automatically in services.msc,HW_PRINT_SPOOLER
 Print queue shows pending document but printer does not print,HW_PRINT_SPOOLER
-RPC server unavailable error when adding network printer,HW_PRINT_SPOOLER
-Shared mailbox folder does not refresh new incoming mail,MAIL_OUTLOOK_SYNC
+network printer IP address changed cannot send print jobs,HW_PRINT_SPOOLER
+new emails arriving on mobile phone but not desktop outlook app,MAIL_OUTLOOK_SYNC
+exchange calendar not updating in outlook,MAIL_OUTLOOK_SYNC
+Outlook client disconnected error in status bar,MAIL_OUTLOOK_SYNC
 Exchange server offline error when opening Outlook,MAIL_OUTLOOK_SYNC
-VPN adapter driver fails to initialize on Windows 11,NET_VPN_DISCONNECT
-vpn tunnel drops when on wifi,NET_VPN_DISCONNECT
-Need permission to access Jira project board for marketing team,UNKNOWN_ESCALATION
-Git push rejected due to remote repository branch protection rule,UNKNOWN_ESCALATION
+Remote access VPN fails when switching from ethernet to Wi-Fi,NET_VPN_DISCONNECT
+GlobalProtect VPN disconnects right after MFA authentication,NET_VPN_DISCONNECT
+VPN client stuck at authenticating stage forever,NET_VPN_DISCONNECT
+VPN session expires every 10 minutes unexpectedly,NET_VPN_DISCONNECT
+Docker desktop engine failed to start hypervisor error,UNKNOWN_ESCALATION
+monitor flickering line on screen replacement needed,UNKNOWN_ESCALATION
+Request new monitor and ergonomic keyboard for home office setup,UNKNOWN_ESCALATION
+the thing is broken please help,UNKNOWN_ESCALATION

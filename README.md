@@ -1,7 +1,7 @@
-# Intelligent IT Ticket Auto-Resolution System (`v0.2.5` Verified)
+# Intelligent IT Ticket Auto-Resolution System (`v0.3.0`)
 
 > [!IMPORTANT]
-> **Verified Baseline Notice (`v0.2.5`)**: In Phase 2.5, an uncompromised verification audit eliminated data leakage artifacts by testing the system against a **held-out evaluation dataset (`eval/data/holdout.csv`)**, auditing Gemini API deep-resolution behavior, and verifying OCR parsing.
+> **Verified Stack & Baseline (`v0.3.0`)**: The system operates on a **Python FastAPI** stack with **PostgreSQL + `pgvector`**, **Redis caching**, **Pytesseract OCR**, **Hybrid Classifier** (`sentence-transformers` + `scikit-learn`), and **Google Gemini RAG Deep Resolution**. Evaluated on an uncompromised 24-row held-out dataset (`eval/data/holdout.csv`).
 
 ---
 
@@ -9,13 +9,13 @@
 
 The Intelligent IT Ticket Auto-Resolution System automatically triages IT support tickets, provides instant step-by-step remediation playbooks for common IT issues, caches historical Q&A resolutions to reduce LLM token usage, and escalates complex tickets to deep AI agent resolution.
 
-### System Capabilities (v0.2.5 Verified)
+### System Capabilities (v0.3.0)
 - **FastAPI Core (`app/main.py`)**: High-performance REST service for ticket resolution, active status polling (`/tickets/{id}/status`), and memory management.
 - **Hybrid Classifier (`app/services/classifier_service.py`)**: Primary dense vector embedding search using `sentence-transformers` (`all-MiniLM-L6-v2`, 384d) with `scikit-learn` (TF-IDF + LogisticRegression) fallback model.
 - **Real OCR Engine (`app/services/ocr_service.py`)**: Text extraction from base64 screenshot bytes using `pytesseract` and `Pillow`.
 - **Google Gemini RAG Deep Resolution (`app/services/llm_service.py`)**: Direct Gemini API integration (`gemini-2.5-flash`) with RAG vector context retrieval and structured mock fallback when `GEMINI_API_KEY` is not provided.
 - **PostgreSQL + `pgvector` & Redis Caching**: Relational vector database tables (`tickets`, `issue_clusters`, `qa_memory`) and Redis resolution hash caching.
-- **Held-Out Evaluation (`scripts/eval.py`)**: Tested against an uncompromised 12-row held-out dataset (`eval/data/holdout.csv`), achieving **66.7% top-1 accuracy** (8/12).
+- **Held-Out Evaluation (`scripts/eval.py`)**: Evaluated against an expanded 24-row held-out dataset (`eval/data/holdout.csv`, 108 total dataset rows), achieving **62.5% top-1 accuracy** (15/24).
 
 ---
 
@@ -69,12 +69,12 @@ Open `http://127.0.0.1:8000/` in your browser for the web interface or `/docs` f
 
 ---
 
-## 4. Verification & Evaluation Scripts
+## 4. Evaluation & Demo Scripts
 
 - **Run Held-Out Classifier Evaluation**:
   ```bash
   python scripts/eval.py
-  # Output: Top-1 Accuracy on Holdout Set: 8/12 (66.7%)
+  # Output: Top-1 Accuracy on Holdout Set: 15/24 (62.5%)
   ```
 - **Audit Deep Resolution Path**:
   ```bash
@@ -120,5 +120,5 @@ Open `http://127.0.0.1:8000/` in your browser for the web interface or `/docs` f
 
 - [PRD (`docs/PRD.md`)](file:///d:/.Study/Projects/it%20teciting/docs/PRD.md): Product requirements and baseline goals.
 - [Architecture (`docs/ARCHITECTURE.md`)](file:///d:/.Study/Projects/it%20teciting/docs/ARCHITECTURE.md): System architecture and held-out evaluation methodology.
-- [Known Limitations (`docs/KNOWN_LIMITATIONS.md`)](file:///d:/.Study/Projects/it%20teciting/docs/KNOWN_LIMITATIONS.md): Phase 2.5 verified audit findings and tradeoffs.
+- [Known Limitations (`docs/KNOWN_LIMITATIONS.md`)](file:///d:/.Study/Projects/it%20teciting/docs/KNOWN_LIMITATIONS.md): Phase 3 verified evaluation audit and bottleneck analysis.
 - [Changelog (`CHANGELOG.md`)](file:///d:/.Study/Projects/it%20teciting/CHANGELOG.md): Version history.

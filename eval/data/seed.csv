@@ -1,52 +1,85 @@
 text,expected_label
-Temporary password received via SMS does not work,ACC_PASSWORD_RESET
-Password expired and self service reset portal throws error,ACC_PASSWORD_RESET
-Active Directory account locked out due to incorrect password,ACC_PASSWORD_RESET
-MFA prompt failing during active directory password reset,ACC_PASSWORD_RESET
-User locked out of corporate laptop after 5 failed password attempts,ACC_PASSWORD_RESET
-Cannot log into Okta single sign-on password invalid,ACC_PASSWORD_RESET
-Expired credentials preventing login to Windows workstation,ACC_PASSWORD_RESET
+authenticator app code rejected when resetting domain password,ACC_PASSWORD_RESET
+azure ad password reset link expired before I clicked it,ACC_PASSWORD_RESET
 Need password reset for domain account after vacation,ACC_PASSWORD_RESET
-Teams screen sharing causes app to freeze and close,APP_TEAMS_CRASH
-Teams cache folder corrupted app fails to launch,APP_TEAMS_CRASH
-Microsoft Teams desktop app crashes continuously on startup,APP_TEAMS_CRASH
-Teams audio device error causes call to crash instantly,APP_TEAMS_CRASH
-teams freeze during video call,APP_TEAMS_CRASH
+Expired credentials preventing login to Windows workstation,ACC_PASSWORD_RESET
+User locked out of corporate laptop after 5 failed password attempts,ACC_PASSWORD_RESET
+Temporary password received via SMS does not work,ACC_PASSWORD_RESET
+new employee first time login default password not working,ACC_PASSWORD_RESET
+Cannot log into Okta single sign-on password invalid,ACC_PASSWORD_RESET
+plz unlock my account I entered wrong pass 3 times,ACC_PASSWORD_RESET
+smartcard login error wrong PIN entered account blocked,ACC_PASSWORD_RESET
+account locked after failed login attempts,ACC_PASSWORD_RESET
+forgot windows login password need emergency unlock,ACC_PASSWORD_RESET
+Active Directory account locked out due to incorrect password,ACC_PASSWORD_RESET
+cannot sign into corporate email password expired yesterday,ACC_PASSWORD_RESET
+teams desktop client white screen error on startup,APP_TEAMS_CRASH
+teams meeting video grid flickering then app force closes,APP_TEAMS_CRASH
+teams crash every time someone posts a GIF in channel,APP_TEAMS_CRASH
 Teams freezing during camera video preview,APP_TEAMS_CRASH
-Teams web works fine but desktop application keeps crashing,APP_TEAMS_CRASH
+teams webview2 process crash code 0xc0000005,APP_TEAMS_CRASH
+teams freeze during video call,APP_TEAMS_CRASH
+teams audio micro lag causes whole app to quit automatically,APP_TEAMS_CRASH
+Teams cache folder corrupted app fails to launch,APP_TEAMS_CRASH
+teams chat window unresponsive typing delay leads to crash,APP_TEAMS_CRASH
+Microsoft Teams desktop app crashes continuously on startup,APP_TEAMS_CRASH
 Microsoft Teams crashes on launch,APP_TEAMS_CRASH
-Printer prints blank pages or garbage characters spooler error,HW_PRINT_SPOOLER
-Printer driver host process stopped working when printing PDF,HW_PRINT_SPOOLER
-printer stuck in queue and spooler errors,HW_PRINT_SPOOLER
+Teams audio device error causes call to crash instantly,APP_TEAMS_CRASH
+High CPU usage causes Microsoft Teams to crash during screen share,APP_TEAMS_CRASH
+Teams web works fine but desktop application keeps crashing,APP_TEAMS_CRASH
+color print job forced to black and white driver error,HW_PRINT_SPOOLER
+wireless printer disconnected from office guest wifi,HW_PRINT_SPOOLER
+Unable to clear stuck print job from local print queue,HW_PRINT_SPOOLER
 Print Spooler service keeps crashing on Windows Print Server,HW_PRINT_SPOOLER
+spoolsv.exe high CPU usage 100% core load,HW_PRINT_SPOOLER
+paper jam cleared but printer still shows error status,HW_PRINT_SPOOLER
+print job status deleting... stuck forever,HW_PRINT_SPOOLER
+cannot print to network printer,HW_PRINT_SPOOLER
+RPC server unavailable error when adding network printer,HW_PRINT_SPOOLER
+Printer prints blank pages or garbage characters spooler error,HW_PRINT_SPOOLER
+printer stuck in queue and spooler errors,HW_PRINT_SPOOLER
 Network printer offline error on floor 3 office printer,HW_PRINT_SPOOLER
 Double sided printing job hung in print queue,HW_PRINT_SPOOLER
-cannot print to network printer,HW_PRINT_SPOOLER
-Unable to clear stuck print job from local print queue,HW_PRINT_SPOOLER
-Print spooler service fails to start,HW_PRINT_SPOOLER
-OST data file corrupted causing Outlook sync failure,MAIL_OUTLOOK_SYNC
-Outlook desktop app stuck on loading profile screen,MAIL_OUTLOOK_SYNC
-Emails stuck in Outbox and will not send,MAIL_OUTLOOK_SYNC
+Printer driver host process stopped working when printing PDF,HW_PRINT_SPOOLER
 Outlook is not syncing my mailbox since yesterday,MAIL_OUTLOOK_SYNC
-Outlook client disconnected error in status bar,MAIL_OUTLOOK_SYNC
+outlook error 0x8004010F MAPI unable to access data file,MAIL_OUTLOOK_SYNC
+Shared mailbox folder does not refresh new incoming mail,MAIL_OUTLOOK_SYNC
+Outlook desktop app stuck on loading profile screen,MAIL_OUTLOOK_SYNC
+OST data file corrupted causing Outlook sync failure,MAIL_OUTLOOK_SYNC
 Sent items folder not synchronizing with webmail,MAIL_OUTLOOK_SYNC
-exchange calendar not updating in outlook,MAIL_OUTLOOK_SYNC
+cannot send mail with attachment bigger than 5mb,MAIL_OUTLOOK_SYNC
+mailbox full warning message keeping outlook from syncing,MAIL_OUTLOOK_SYNC
+autodiscover XML configuration fails during outlook mail setup,MAIL_OUTLOOK_SYNC
+outlook rule failed to move incoming messages to folder,MAIL_OUTLOOK_SYNC
+outlook stuck on updating local calendar items,MAIL_OUTLOOK_SYNC
 Outlook prompts for password repeatedly and fails to sync,MAIL_OUTLOOK_SYNC
-GlobalProtect VPN disconnects right after MFA authentication,NET_VPN_DISCONNECT
-Tunnel connection reset by peer error on SSL VPN,NET_VPN_DISCONNECT
-VPN + Outlook both broken after update,NET_VPN_DISCONNECT
-VPN client stuck at authenticating stage forever,NET_VPN_DISCONNECT
-Cisco AnyConnect shows gateway timeout and drops connection,NET_VPN_DISCONNECT
+exchange online inbox search index not returning recent emails,MAIL_OUTLOOK_SYNC
+Emails stuck in Outbox and will not send,MAIL_OUTLOOK_SYNC
 My VPN keeps disconnecting every few minutes,NET_VPN_DISCONNECT
-VPN session expires every 10 minutes unexpectedly,NET_VPN_DISCONNECT
+vpn client freezes laptop network interfaces completely,NET_VPN_DISCONNECT
+wireguard connection drops as soon as I open browser,NET_VPN_DISCONNECT
+vpn tunnel drops when on wifi,NET_VPN_DISCONNECT
 Cannot connect to corporate network via VPN while remote,NET_VPN_DISCONNECT
-Remote access VPN fails when switching from ethernet to Wi-Fi,NET_VPN_DISCONNECT
-screenshot attached showing error,UNKNOWN_ESCALATION
-Docking station HDMI port not detecting external dual monitor,UNKNOWN_ESCALATION
-SAP ERP financial transaction module throws database lock error,UNKNOWN_ESCALATION
-the thing is broken please help,UNKNOWN_ESCALATION
-MacBook battery draining rapidly after MacOS upgrade,UNKNOWN_ESCALATION
+VPN adapter driver fails to initialize on Windows 11,NET_VPN_DISCONNECT
+vpn icon yellow triangle exclamation mark no internet access,NET_VPN_DISCONNECT
+cannot reach intranet server even though vpn shows connected,NET_VPN_DISCONNECT
+Tunnel connection reset by peer error on SSL VPN,NET_VPN_DISCONNECT
+forticlient error 5029 authentication failed on gateway,NET_VPN_DISCONNECT
+Cisco AnyConnect shows gateway timeout and drops connection,NET_VPN_DISCONNECT
+vpn drops connection whenever laptop goes to sleep,NET_VPN_DISCONNECT
+split tunneling not working all traffic routed to vpn,NET_VPN_DISCONNECT
+vpn not connecting getting DNS resolution failed error,NET_VPN_DISCONNECT
+VPN + Outlook both broken after update,UNKNOWN_ESCALATION
+Git push rejected due to remote repository branch protection rule,UNKNOWN_ESCALATION
 asdf qwer zxcv nothing matches,UNKNOWN_ESCALATION
-Docker desktop engine failed to start hypervisor error,UNKNOWN_ESCALATION
+Docking station HDMI port not detecting external dual monitor,UNKNOWN_ESCALATION
+laptop fan noise loud overheating when compiling C++ project,UNKNOWN_ESCALATION
+wifi password for guest network in building B,UNKNOWN_ESCALATION
+MacBook battery draining rapidly after MacOS upgrade,UNKNOWN_ESCALATION
+SAP ERP financial transaction module throws database lock error,UNKNOWN_ESCALATION
+need license key for Adobe Creative Cloud Illustrator,UNKNOWN_ESCALATION
+screenshot attached showing error,UNKNOWN_ESCALATION
+request access to internal shared drive \\\\nas01\\finance,UNKNOWN_ESCALATION
+Print spooler service fails to start,UNKNOWN_ESCALATION
+Need permission to access Jira project board for marketing team,UNKNOWN_ESCALATION
 Blue screen of death BSOD with stop code CRITICAL_PROCESS_DIED,UNKNOWN_ESCALATION
-Request new monitor and ergonomic keyboard for home office setup,UNKNOWN_ESCALATION

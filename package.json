@@ -1,8 +1,8 @@
 {
   "name": "it-ticket-auto-resolution",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Intelligent IT Ticket Auto-Resolution System v0.2.0 (Python FastAPI + pgvector + Redis)",
+  "description": "Intelligent IT Ticket Auto-Resolution System v0.3.0 (Python FastAPI + pgvector + Redis + RAG)",
   "scripts": {
     "install:deps": "pip install -r requirements.txt",
     "seed": "python scripts/seed_db.py",
