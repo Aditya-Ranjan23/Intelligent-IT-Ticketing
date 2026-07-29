@@ -1,7 +1,7 @@
-# Intelligent IT Ticket Auto-Resolution System (`v0.2.0`)
+# Intelligent IT Ticket Auto-Resolution System (`v0.2.5` Verified)
 
 > [!IMPORTANT]
-> **Codebase Stack Notice (`v0.2.0`)**: In Phase 2, the system was completely rewritten into a modular **Python FastAPI** stack with **PostgreSQL + `pgvector`**, **Redis caching**, **Real pytesseract OCR**, **Hybrid Classifier** (`sentence-transformers` + `scikit-learn`), and **Google Gemini RAG Deep Resolution**.
+> **Verified Baseline Notice (`v0.2.5`)**: In Phase 2.5, an uncompromised verification audit eliminated data leakage artifacts by testing the system against a **held-out evaluation dataset (`eval/data/holdout.csv`)**, auditing Gemini API deep-resolution behavior, and verifying OCR parsing.
 
 ---
 
@@ -9,13 +9,13 @@
 
 The Intelligent IT Ticket Auto-Resolution System automatically triages IT support tickets, provides instant step-by-step remediation playbooks for common IT issues, caches historical Q&A resolutions to reduce LLM token usage, and escalates complex tickets to deep AI agent resolution.
 
-### Key Capabilities in v0.2.0
-- **FastAPI Core (`app/main.py`)**: High-performance REST service for ticket resolution, active polling, and memory management.
-- **Hybrid Classifier (`app/services/classifier_service.py`)**: Primary dense vector embedding search using `sentence-transformers` (`all-MiniLM-L6-v2`, 384d) with `scikit-learn` (TF-IDF + LogisticRegression) fallback.
-- **Real OCR Engine (`app/services/ocr_service.py`)**: Text extraction from screenshot image bytes using `pytesseract` and `Pillow`.
-- **Google Gemini RAG Deep Resolution (`app/services/llm_service.py`)**: Direct Gemini API integration (`gemini-2.5-flash`) with RAG vector context retrieval and structured mock fallback.
-- **PostgreSQL + `pgvector` & Redis Caching**: Relational vector database tables (`tickets`, `issue_clusters`, `qa_memory`) and Redis resolution hash caching (`app/services/cache_service.py`).
-- **Offline Evaluation (`scripts/eval.py`)**: Evaluated against an expanded 63-row labeled dataset (`eval/data/tickets-labeled.csv`), achieving **100.0% top-1 accuracy** (63/63).
+### System Capabilities (v0.2.5 Verified)
+- **FastAPI Core (`app/main.py`)**: High-performance REST service for ticket resolution, active status polling (`/tickets/{id}/status`), and memory management.
+- **Hybrid Classifier (`app/services/classifier_service.py`)**: Primary dense vector embedding search using `sentence-transformers` (`all-MiniLM-L6-v2`, 384d) with `scikit-learn` (TF-IDF + LogisticRegression) fallback model.
+- **Real OCR Engine (`app/services/ocr_service.py`)**: Text extraction from base64 screenshot bytes using `pytesseract` and `Pillow`.
+- **Google Gemini RAG Deep Resolution (`app/services/llm_service.py`)**: Direct Gemini API integration (`gemini-2.5-flash`) with RAG vector context retrieval and structured mock fallback when `GEMINI_API_KEY` is not provided.
+- **PostgreSQL + `pgvector` & Redis Caching**: Relational vector database tables (`tickets`, `issue_clusters`, `qa_memory`) and Redis resolution hash caching.
+- **Held-Out Evaluation (`scripts/eval.py`)**: Tested against an uncompromised 12-row held-out dataset (`eval/data/holdout.csv`), achieving **66.7% top-1 accuracy** (8/12).
 
 ---
 
@@ -42,7 +42,7 @@ The Intelligent IT Ticket Auto-Resolution System automatically triages IT suppor
    ```bash
    pip install -r requirements.txt
    ```
-2. Seed the database and compute vector embeddings:
+2. Seed the database vector store from `eval/data/seed.csv`:
    ```bash
    python scripts/seed_db.py
    # OR
@@ -69,21 +69,20 @@ Open `http://127.0.0.1:8000/` in your browser for the web interface or `/docs` f
 
 ---
 
-## 4. Evaluation & Demo Scripts
+## 4. Verification & Evaluation Scripts
 
-- **Run Offline Classifier Evaluation**:
+- **Run Held-Out Classifier Evaluation**:
   ```bash
   python scripts/eval.py
-  # Output: Top-1 Accuracy: 63/63 (100.0%)
+  # Output: Top-1 Accuracy on Holdout Set: 8/12 (66.7%)
   ```
-- **Seed Database & Train Fallback Classifier**:
+- **Audit Deep Resolution Path**:
   ```bash
-  python scripts/seed_db.py
+  python scripts/test_deep_path.py
   ```
-- **Run Python API Demo**:
+- **Audit Real Image OCR Extraction**:
   ```bash
-  # Start the API server first, then run:
-  python scripts/demo.py
+  python scripts/test_ocr.py
   ```
 
 ---
@@ -96,15 +95,13 @@ Open `http://127.0.0.1:8000/` in your browser for the web interface or `/docs` f
 | `GET` | `/health` | Service & DB health check (`{"ok": true}`) | Active |
 | `GET` | `/ml/stats` | Returns vector memory entry count | Active |
 | `POST` | `/tickets/resolve` | Main ticket resolution workflow | Active |
-| `GET` | `/tickets/{id}/status` | Active status polling for async deep resolution | **Active (v0.2.0)** |
+| `GET` | `/tickets/{id}/status` | Active status polling for async deep resolution | Active |
 | `POST` | `/memory/store` | Stores a Q&A resolution into `pgvector` memory | Active |
 | `POST` | `/memory/resolve-and-store` | Stores verified answer after external resolution | Active |
 
 ---
 
 ## 6. Environment Variables
-
-Configure via `.env` file:
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
@@ -122,6 +119,6 @@ Configure via `.env` file:
 ## 7. Documentation Suite
 
 - [PRD (`docs/PRD.md`)](file:///d:/.Study/Projects/it%20teciting/docs/PRD.md): Product requirements and baseline goals.
-- [Architecture (`docs/ARCHITECTURE.md`)](file:///d:/.Study/Projects/it%20teciting/docs/ARCHITECTURE.md): Updated v0.2.0 system architecture and sequence flows.
-- [Known Limitations (`docs/KNOWN_LIMITATIONS.md`)](file:///d:/.Study/Projects/it%20teciting/docs/KNOWN_LIMITATIONS.md): Resolved v0.1.0 stubs and v0.2.0 technical tradeoffs.
+- [Architecture (`docs/ARCHITECTURE.md`)](file:///d:/.Study/Projects/it%20teciting/docs/ARCHITECTURE.md): System architecture and held-out evaluation methodology.
+- [Known Limitations (`docs/KNOWN_LIMITATIONS.md`)](file:///d:/.Study/Projects/it%20teciting/docs/KNOWN_LIMITATIONS.md): Phase 2.5 verified audit findings and tradeoffs.
 - [Changelog (`CHANGELOG.md`)](file:///d:/.Study/Projects/it%20teciting/CHANGELOG.md): Version history.

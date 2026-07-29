@@ -1,0 +1,13 @@
+text,expected_label
+I forgot my password and cannot sign in,ACC_PASSWORD_RESET
+account locked after failed login attempts,ACC_PASSWORD_RESET
+Teams meeting drops out with unexpected app error code 0x8004,APP_TEAMS_CRASH
+High CPU usage causes Microsoft Teams to crash during screen share,APP_TEAMS_CRASH
+Print queue shows pending document but printer does not print,HW_PRINT_SPOOLER
+RPC server unavailable error when adding network printer,HW_PRINT_SPOOLER
+Shared mailbox folder does not refresh new incoming mail,MAIL_OUTLOOK_SYNC
+Exchange server offline error when opening Outlook,MAIL_OUTLOOK_SYNC
+VPN adapter driver fails to initialize on Windows 11,NET_VPN_DISCONNECT
+vpn tunnel drops when on wifi,NET_VPN_DISCONNECT
+Need permission to access Jira project board for marketing team,UNKNOWN_ESCALATION
+Git push rejected due to remote repository branch protection rule,UNKNOWN_ESCALATION

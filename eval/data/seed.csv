@@ -1,0 +1,52 @@
+text,expected_label
+Temporary password received via SMS does not work,ACC_PASSWORD_RESET
+Password expired and self service reset portal throws error,ACC_PASSWORD_RESET
+Active Directory account locked out due to incorrect password,ACC_PASSWORD_RESET
+MFA prompt failing during active directory password reset,ACC_PASSWORD_RESET
+User locked out of corporate laptop after 5 failed password attempts,ACC_PASSWORD_RESET
+Cannot log into Okta single sign-on password invalid,ACC_PASSWORD_RESET
+Expired credentials preventing login to Windows workstation,ACC_PASSWORD_RESET
+Need password reset for domain account after vacation,ACC_PASSWORD_RESET
+Teams screen sharing causes app to freeze and close,APP_TEAMS_CRASH
+Teams cache folder corrupted app fails to launch,APP_TEAMS_CRASH
+Microsoft Teams desktop app crashes continuously on startup,APP_TEAMS_CRASH
+Teams audio device error causes call to crash instantly,APP_TEAMS_CRASH
+teams freeze during video call,APP_TEAMS_CRASH
+Teams freezing during camera video preview,APP_TEAMS_CRASH
+Teams web works fine but desktop application keeps crashing,APP_TEAMS_CRASH
+Microsoft Teams crashes on launch,APP_TEAMS_CRASH
+Printer prints blank pages or garbage characters spooler error,HW_PRINT_SPOOLER
+Printer driver host process stopped working when printing PDF,HW_PRINT_SPOOLER
+printer stuck in queue and spooler errors,HW_PRINT_SPOOLER
+Print Spooler service keeps crashing on Windows Print Server,HW_PRINT_SPOOLER
+Network printer offline error on floor 3 office printer,HW_PRINT_SPOOLER
+Double sided printing job hung in print queue,HW_PRINT_SPOOLER
+cannot print to network printer,HW_PRINT_SPOOLER
+Unable to clear stuck print job from local print queue,HW_PRINT_SPOOLER
+Print spooler service fails to start,HW_PRINT_SPOOLER
+OST data file corrupted causing Outlook sync failure,MAIL_OUTLOOK_SYNC
+Outlook desktop app stuck on loading profile screen,MAIL_OUTLOOK_SYNC
+Emails stuck in Outbox and will not send,MAIL_OUTLOOK_SYNC
+Outlook is not syncing my mailbox since yesterday,MAIL_OUTLOOK_SYNC
+Outlook client disconnected error in status bar,MAIL_OUTLOOK_SYNC
+Sent items folder not synchronizing with webmail,MAIL_OUTLOOK_SYNC
+exchange calendar not updating in outlook,MAIL_OUTLOOK_SYNC
+Outlook prompts for password repeatedly and fails to sync,MAIL_OUTLOOK_SYNC
+GlobalProtect VPN disconnects right after MFA authentication,NET_VPN_DISCONNECT
+Tunnel connection reset by peer error on SSL VPN,NET_VPN_DISCONNECT
+VPN + Outlook both broken after update,NET_VPN_DISCONNECT
+VPN client stuck at authenticating stage forever,NET_VPN_DISCONNECT
+Cisco AnyConnect shows gateway timeout and drops connection,NET_VPN_DISCONNECT
+My VPN keeps disconnecting every few minutes,NET_VPN_DISCONNECT
+VPN session expires every 10 minutes unexpectedly,NET_VPN_DISCONNECT
+Cannot connect to corporate network via VPN while remote,NET_VPN_DISCONNECT
+Remote access VPN fails when switching from ethernet to Wi-Fi,NET_VPN_DISCONNECT
+screenshot attached showing error,UNKNOWN_ESCALATION
+Docking station HDMI port not detecting external dual monitor,UNKNOWN_ESCALATION
+SAP ERP financial transaction module throws database lock error,UNKNOWN_ESCALATION
+the thing is broken please help,UNKNOWN_ESCALATION
+MacBook battery draining rapidly after MacOS upgrade,UNKNOWN_ESCALATION
+asdf qwer zxcv nothing matches,UNKNOWN_ESCALATION
+Docker desktop engine failed to start hypervisor error,UNKNOWN_ESCALATION
+Blue screen of death BSOD with stop code CRITICAL_PROCESS_DIED,UNKNOWN_ESCALATION
+Request new monitor and ergonomic keyboard for home office setup,UNKNOWN_ESCALATION

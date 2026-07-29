@@ -14,7 +14,7 @@ from app.core.database import SessionLocal, init_db
 from app.models.ticket import IssueCluster, QAMemory
 from app.services.classifier_service import compute_embedding, fit_fallback_classifier
 
-CSV_PATH = ROOT / "eval" / "data" / "tickets-labeled.csv"
+CSV_PATH = ROOT / "eval" / "data" / "seed.csv"
 
 PLAYBOOK_STEPS = {
     "NET_VPN_DISCONNECT": [
